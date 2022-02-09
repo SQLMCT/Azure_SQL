@@ -1,0 +1,23 @@
+ 
+Documentation for SQL SKU Assessment Console: https://docs.microsoft.com/en-us/sql/dma/dma-sku-recommend-sql-db?view=sql-server-ver15#use-the-console-application-to-get-sku-recommendations
+
+Commands:
+
+
+CD "C:\Program Files\Microsoft Data Migration Assistant\SQLAssessmentConsole
+
+
+.\SqlAssessment.exe PerfDataCollection --sqlConnectionStrings "Data Source=.\jdsql19;Initial Catalog=master;Integrated Security=True;" --outputFolder C:\Output
+
+
+.\SqlAssessment.exe GetSkuRecommendation --outputFolder C:\Output --targetPlatform AzureSqlDatabase
+
+
+.\SqlAssessment.exe GetSkuRecommendation --outputFolder C:\Output --targetPlatform AzureSqlManagedInstance --elasticStrategy true
+
+
+.\SqlAssessment.exe GetSkuRecommendation --outputFolder C:\Output --targetPlatform AzureSqlVirtualMachine
+
+
+
+
