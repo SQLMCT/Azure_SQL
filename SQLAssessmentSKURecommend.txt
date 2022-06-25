@@ -4,7 +4,7 @@ Documentation for SQL SKU Assessment Console: https://docs.microsoft.com/en-us/s
 Commands:
 
 
-CD "C:\Program Files\Microsoft Data Migration Assistant\SQLAssessmentConsole
+CD "C:\Program Files\Microsoft Data Migration Assistant\SQLAssessmentConsole"
 
 
 .\SqlAssessment.exe PerfDataCollection --sqlConnectionStrings "Data Source=.\jdsql19;Initial Catalog=master;Integrated Security=True;" --outputFolder C:\Output

@@ -67,7 +67,7 @@ CREATE DATABASE SCOPED CREDENTIAL
      [https://deardurffstorage.blob.core.windows.net/xevents]
     WITH    IDENTITY = 'SHARED ACCESS SIGNATURE',  -- "SAS" token.
 -- Paste in the long SasToken string here for Secret, but exclude any leading '?'.
-    SECRET = 'sv=2020-04-08&ss=btqf&srt=sco&st=2022-01-20T14%3A16%3A24Z&se=2022-01-21T14%3A16%3A24Z&sp=rl&sig=pLlyJGn3NDTRT30L%2B5%2BAkAvqOXgBHXuUBMI3Vmwfhzc%3D'
+    SECRET = 'sv=2020-04-08&st=2022-02-09T14%3A08%3A40Z&se=2022-02-10T14%3A08%3A40Z&sr=c&sp=racwdxlt&sig=jN7VMJ3X%2FSVTPFAnIMzLpg7Rr2tRcf8sAS2PDkoxi1s%3D'
     ;
 GO
 
@@ -95,7 +95,7 @@ CREATE EVENT SESSION JDeventsessionname
         sqlserver.sql_statement_starting
             (
             ACTION (sqlserver.sql_text)
-            WHERE statement LIKE 'UPDATE JDTabEmployee%'
+            --WHERE statement LIKE 'UPDATE JDTabEmployee%'
             )
     ADD TARGET
         package0.event_file
