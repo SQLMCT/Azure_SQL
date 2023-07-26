@@ -37,7 +37,7 @@ EXEC jobs.sp_add_target_group_member
 'ServerGroup1',
 @target_type = 'SqlServer',
 @refresh_credential_name='mymastercred', --credential required to refresh the databases in server
-@server_name='jdtestserver.database.windows.net'
+@server_name='jdsqlazure.database.windows.net'
 
 --8.	Add a job
 --Open a new query window and connect to the jobdatabase database
@@ -60,7 +60,7 @@ WHERE end_time > DATEADD(mi, -20, GETDATE());',
 @target_group_name='ServerGroup1',
 @output_type='SqlDatabase',
 @output_credential_name='myjobcred',
-@output_server_name='jdtestserver.database.windows.net',
+@output_server_name='jdsqlazure.database.windows.net',
 @output_database_name='PerfResults',
 @output_table_name='ResourceStats'
 
@@ -92,6 +92,9 @@ ORDER BY start_time DESC
 SELECT * FROM jobs.job_executions 
 WHERE is_active = 1
 ORDER BY start_time DESC
+
+--Stop the script from running.
+EXEC jobs.sp_stop_job '972F3439-DCD0-47E7-B123-925AD5F4300C'
 
 
 

@@ -14,7 +14,7 @@ CREATE USER MaryUser FROM LOGIN MaryLogin;
 /*4. Grant permissions to the user by assign him to a database role*/
 ALTER ROLE db_datareader ADD MEMBER MaryUser;
 
---2.	Using contained database user (SQL User with password, no login is involved)
+--2. Using contained database user (SQL User with password, no login is involved)
 /*1: Create SQL user with password on the user database (connect with admin account to user database)*/
 CREATE USER KennyUser WITH PASSWORD = 'P@$$w0rd1';
 
