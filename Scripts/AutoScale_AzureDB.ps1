@@ -48,11 +48,17 @@ if ($WebhookData){
 
         # Here, we connect to the Azure Portal with the Automation Run As account we provisioned when creating the Automation account.
 
-        $connectionName = "AzureRunAsConnection"
+        #$connectionName = "AzureRunAsConnection"
         try
         {
             # Get the connection "AzureRunAsConnection "
-            $servicePrincipalConnection=Get-AutomationConnection -Name $connectionName         
+            #$servicePrincipalConnection=Get-AutomationConnection -Name $connectionName         
+        #Ensures you do not inherit an AZContext in your runbook
+        Disable-AzContextAutosave -SCope Process | Out-Null
+
+        #Connect using a Managed Service Identity
+        $AzureContext = (Connect-AzAccount -Identity).context
+        
 
             "Logging in to Azure..."
             Add-AzureRmAccount `
