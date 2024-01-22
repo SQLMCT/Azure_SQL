@@ -1,21 +1,13 @@
--- Demonstration 1: Setup Elastic Agent Service, JobsDB and PerfResults database, and Logins for SQL accounts and Managed Identities. 
+-- Demonstration 1: Setup Elastic Agent Service, JobsDB and PerfResults database, and Logins for SQL Authencation Accounts. (Managed Identities will be covered in Demonstration 3. 
 
 -- Create a JobsDB and PerfResults database
 -- The JobsDB must be at least Standard with 20 DTUs (S1 Tier)
 -- https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal
 
--- Create a Managed Identity named [SQLAgentService]
--- (This will be used for Demonstration 3)
--- This is not needed if you are only using SQL Authentication,
--- https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-manage-user-assigned-managed-identities?pivots=identity-mi-methods-azp
-
--- Create Elastic Agent Service
+-- Create Elastic Agent Service -- Do not create a Managed Identity yet.
 -- https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-jobs-tutorial?view=azuresql
 
 -- Create a firewall rule for the service on the logical server
-
--- Create logins in the master database for the Managed Identity
-CREATE LOGIN [SQLAgentService] FROM EXTERNAL PROVIDER; 
 
 -- Create logins in the master database for SQL Server Authenticion
 CREATE LOGIN mastercred WITH PASSWORD='ReallyD1ff1cultP@ssw0rd!'
@@ -24,11 +16,7 @@ CREATE LOGIN jobcred WITH PASSWORD='ReallyD1ff1cultP@ssw0rd!'
 
 -- Create a database user in every database where you want to execute the job.
 -- Make sure to run on all user databases on the logical server.
--- Create the database user jobcred and [SQLAgentService]
--- Change [SQLAgentService] to the name of the Managed Identity
-CREATE USER [SQLAgentService] FROM LOGIN [SQLAgentService]
-ALTER ROLE db_owner ADD MEMBER [SQLAgentService]
-
+-- Create the database user jobcred
 CREATE USER jobcred FROM LOGIN jobcred
 ALTER ROLE db_owner ADD MEMBER jobcred
 
@@ -128,77 +116,4 @@ ORDER BY start_time DESC
 
 -- Stop the script from running
 -- Paste Job_Execution_ID
-EXEC jobs.sp_stop_job 'BF5E6C05-E903-4B2F-9DDD-235781D8F729'
-
-
--- Demonstration 3: Create an Elastic Database Job with Managed Identity
-
--- We can write maintenance scripts to perform index and statistic maintenance.
--- This demonstration is using the AzureSQLMaintenance custom stored procedure
--- developed by Microsoft’s Yochanan Rachamim. It is suitable for Azure SQL and
--- compatible with its supported features. 
-
--- To create and use this store procedure.
--- Open the following link and copy all the procedure code. (CTRL + A)
--- Open a new query window and connect to your Azure SQL database.
--- Paste the procedure code and Execute.
--- You will need to perform this on each user database.
--- https://raw.githubusercontent.com/yochananrachamim/AzureSQL/master/AzureSQLMaintenance.txt
-
--- Add a new job -- Connect to the JobsDB database
--- Execute the following statement to add a new job that will be scheduled for 
--- every15 minutes to tune indexes and statistics. Do not use 15 minute intervals
--- in a real world scenario.
-EXEC jobs.sp_add_job @job_name ='Index_Stats_Maintenance', 
-@description='Perform index and statisics maintenance',
-@schedule_interval_type='Minutes',
-@schedule_interval_count = 15
-
--- Add a job step -- Connect to the JobsDB database.
--- Make sure to modify the <Your Logical Server Name>.
--- The stored procedure outputs results to a table on each database.
-EXEC jobs.sp_add_jobstep
-@job_name='Index_Stats_Maintenance',
-@command= N'EXECUTE dbo.AzureSQLMaintenance "all", @LogToTable=1;',
-@target_group_name='ServerGroup1'
-
--- Execute the job
--- Open a new query window and connect to the jobdatabase database
--- Execute the following statements to start the job manually
-EXEC jobs.sp_start_job 'Index_Stats_Maintenance'
-
--- Connect to the JobsDB database
--- Execute the following statements to view the execution status for all jobs
-
--- View top-level execution status for the job named 'Index_Stats_Maintenance'
-SELECT * FROM jobs.job_executions 
-WHERE job_name = 'Index_Stats_Maintenance' and step_id IS NULL
-ORDER BY start_time DESC
-
--- View error or success messages
--- Error message could occur if a database does not have
--- the AzureSQLMaintenance Stored Procedure.
-SELECT last_message FROM jobs.job_executions 
-WHERE job_name = 'Index_Stats_Maintenance' and step_name <> 'NULL'
-
--- View all top-level execution status for all jobs
-SELECT * FROM jobs.job_executions WHERE step_id IS NULL
-ORDER BY start_time DESC
-
--- Review index and statistics maintenance results.
--- Switch to the user database that has the AzureSQL Maintenance Store Procedure.
-SELECT * FROM [dbo].[AzureSQLMaintenanceLog]
-
--- Switch back to Jobs database
--- Copy Job_Execution_ID
-SELECT * FROM jobs.job_executions 
-WHERE is_active = 1
-ORDER BY start_time DESC
-
--- Stop the script from running
--- Paste Job_Execution_ID
-EXEC jobs.sp_stop_job '225ABAF7-F4B2-4F01-ADD3-1B073A09FC22'
-
--- Be sure to return to the Job Agent Service in the Azure Portal to demonstrate
--- Jobs Definitions, Job Executions, and Target Groups.
-
+EXEC jobs.sp_stop_job '84FF8771-0F3C-4D48-B59C-48F58BACE9A5'
