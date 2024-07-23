@@ -1,10 +1,10 @@
--- Demonstration 1: Setup Elastic Agent Service, JobsDB and PerfResults database, and Logins for SQL Authencation Accounts. (Managed Identities will be covered in Demonstration 3. 
+-- Demonstration 1: Setup Elastic Agent Service, JobsDB and PerfResults database, and Logins for SQL Authencation Accounts. You could also demonstrate using Managed Identities instead. 
 
 -- Create a JobsDB and PerfResults database
 -- The JobsDB must be at least Standard with 20 DTUs (S1 Tier)
 -- https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal
 
--- Create Elastic Agent Service -- Do not create a Managed Identity yet.
+-- Create Elastic Agent Service 
 -- https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-jobs-tutorial?view=azuresql
 
 -- Create a firewall rule for the service on the logical server
@@ -51,7 +51,7 @@ EXEC jobs.sp_add_target_group 'ServerGroup1'
 EXEC jobs.sp_add_target_group_member 'ServerGroup1',
 @target_type = 'SqlServer',
 @refresh_credential_name='mymastercred', 
-@server_name='jdsqlcentral.database.windows.net'
+@server_name='logicalserver.database.windows.net' --change logical server name
 
 -- View the recently created target group and target group members
 SELECT * FROM jobs.target_groups WHERE target_group_name='ServerGroup1';
@@ -81,7 +81,7 @@ WHERE end_time > DATEADD(mi, -20, GETDATE());',
 @target_group_name='ServerGroup1',
 @output_type='SqlDatabase',
 @output_credential_name='myjobcred',
-@output_server_name='jdsqlcentral.database.windows.net',
+@output_server_name='logicalserver.database.windows.net', --change logical server name
 @output_database_name='PerfResults',
 @output_table_name='ResourceStats'
 
@@ -116,4 +116,4 @@ ORDER BY start_time DESC
 
 -- Stop the script from running
 -- Paste Job_Execution_ID
-EXEC jobs.sp_stop_job '84FF8771-0F3C-4D48-B59C-48F58BACE9A5'
+EXEC jobs.sp_stop_job '84FF8771-0F3C-4D48-B59C-48F58BACE9A5' --This value changes each demonstration.
